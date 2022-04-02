@@ -4,8 +4,8 @@ import MySQLdb as mdb
 
 def registerAccount():
 
-    db = mdb.connect(host='localhost', user='root', password='lineage38', database='python',
-                     port=3307)  # connect to database
+    global entry_1
+    global entry_2
 
     root = Tk()
     root.geometry("500x500")
@@ -24,11 +24,11 @@ def registerAccount():
 
     varPass = StringVar()
     # this creates 'Label' widget for password and uses place() method.
-    label_1 = Label(root, text="Password", width=20, font=("bold", 10))
-    label_1.place(x=80, y=170)
+    label_2 = Label(root, text="Password", width=20, font=("bold", 10))
+    label_2.place(x=80, y=170)
     # this will accept the input string text from the user.
-    entry_1 = Entry(root,textvariable=varPass)
-    entry_1.place(x=240, y=170)
+    entry_2 = Entry(root,textvariable=varPass)
+    entry_2.place(x=240, y=170)
 
     #this creates 'Label' widget for Email and uses place() method.
     label_3 =Label(root,text="Email", width=20,font=("bold",10))
@@ -76,17 +76,28 @@ def registerAccount():
     Checkbutton(root,text="German", variable=var2).place(x=290,y=330)
 
     #this creates button for submitting the details provides by the user
-    Button(root, text='Submit' , width=20,bg="black",fg='white', command = insertData(db, varUser, varPass)).place(x=180,y=380)
+    Button(root, text='Submit' , width=20,bg="black",fg='white', command = insertData).place(x=180,y=380)
 
     root.mainloop()
 
 
-def insertData(db,varUser,varPass):
+def insertData():
+
+    userN = entry_1.get()
+    passN = entry_2.get()
+
+    db = mdb.connect(host='localhost', user='root', password='lineage38', database='python',
+                     port=3307)  # connect to database
+
     cursorInsert = db.cursor()
 
     sql_insert_Query = "INSERT INTO user (username,password) VALUES (%s,%s)"
-    val = (varUser, varPass)
-    cursorInsert.execute(sql_insert_Query, val)
-
-    db.commit()
+    val = (userN, passN)
+    try:
+        # executing the sql command
+        cursorInsert.execute(sql_insert_Query, val)
+        # commit changes in database
+        db.commit()
+    except:
+        db.rollback()
 
