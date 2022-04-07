@@ -4,8 +4,9 @@ import MySQLdb as mdb
 
 def registerAccount():
 
-    global entry_1
-    global entry_2
+    global entry_user
+    global entry_pass
+    global entry_email
 
     root = Tk()
     root.geometry("500x500")
@@ -19,22 +20,23 @@ def registerAccount():
     label_1 =Label(root,text="Username",  width=20,font=("bold",10))
     label_1.place(x=80,y=130)
      #this will accept the input string text from the user.
-    entry_1=Entry(root,textvariable=varUser)
-    entry_1.place(x=240,y=130)
+    entry_user=Entry(root,textvariable=varUser)
+    entry_user.place(x=240,y=130)
 
     varPass = StringVar()
     # this creates 'Label' widget for password and uses place() method.
     label_2 = Label(root, text="Password", width=20, font=("bold", 10))
     label_2.place(x=80, y=170)
     # this will accept the input string text from the user.
-    entry_2 = Entry(root,textvariable=varPass)
-    entry_2.place(x=240, y=170)
+    entry_pass = Entry(root,textvariable=varPass)
+    entry_pass.place(x=240, y=170)
 
+    varEmail = StringVar()
     #this creates 'Label' widget for Email and uses place() method.
     label_3 =Label(root,text="Email", width=20,font=("bold",10))
     label_3.place(x=68,y=200)
-    entry_3=Entry(root)
-    entry_3.place(x=240,y=200)
+    entry_email=Entry(root, textvariable=varEmail)
+    entry_email.place(x=240,y=200)
 
     #this creates 'Label' widget for Gender and uses place() method.
     label_4 =Label(root,text="Gender", width=20,font=("bold",10))
@@ -83,16 +85,17 @@ def registerAccount():
 
 def insertData():
 
-    userN = entry_1.get()
-    passN = entry_2.get()
+    userN = entry_user.get()
+    passN = entry_pass.get()
+    emailN = entry_email.get()
 
     db = mdb.connect(host='localhost', user='root', password='lineage38', database='python',
                      port=3307)  # connect to database
 
     cursorInsert = db.cursor()
 
-    sql_insert_Query = "INSERT INTO user (username,password) VALUES (%s,%s)"
-    val = (userN, passN)
+    sql_insert_Query = "INSERT INTO users (username,password,email) VALUES (%s,%s,%s)"
+    val = (userN, passN,emailN)
     try:
         # executing the sql command
         cursorInsert.execute(sql_insert_Query, val)
