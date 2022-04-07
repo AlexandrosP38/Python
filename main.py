@@ -1,55 +1,73 @@
 import tkinter as tk
 from functools import partial
 import MySQLdb as mdb
-from importData import *
-from showData import *
 from cookiesRequest import *
 from newWindow import *
 from registrationForm import *
+from showData import *
+
+def mainWindow():
+
+    global root
+    global call_connection
+    global entry_user
+    global entry_pass
+
+    root = tk.Tk()  # call tkinter library to create the window
+    root.geometry("500x500")
+    root.title('Fantastic Sardines')
+
+    varUser = StringVar()
+    # this creates 'Label' widget for Username and uses place() method.
+    label_1 = Label(root, text="Username", width=20, font=("bold", 10))
+    label_1.place(x=80, y=130)
+    # this will accept the input string text from the user.
+    entry_user = Entry(root, textvariable=varUser)
+    entry_user.place(x=240, y=130)
+
+    varPass = StringVar()
+    # this creates 'Label' widget for password and uses place() method.
+    label_2 = Label(root, text="Password", width=20, font=("bold", 10))
+    label_2.place(x=80, y=170)
+    # this will accept the input string text from the user.
+    entry_pass = Entry(root, textvariable=varPass)
+    entry_pass.place(x=240, y=170)
 
 
-def call_connection(label_connection, username, passw):        # Create function to connect and show result
-    user = (username.get())                                    # using get to retrieve user info
-    password = (passw.get())
+    Button(root, text='Login', width=20, bg="black", fg='white', command=call_connection).place(x=180,y=220)
+
+
+def call_connection():        # Create function to connect and show result
+
+    userN = entry_user.get()
+    passN = entry_pass.get()
 
     try:
-        db = mdb.connect(host='localhost', user=user, password=password, database='python', port=3307)  #connect to database
-        label_connection.configure(text="Connected Successfully")
+        db = mdb.connect(host='localhost', user='root', password='lineage38', database='python', port=3307)  #connect to database
 
+        cursordb = db.cursor()
+        sql = "SELECT * FROM users WHERE username = %s AND password = %s"
+        val = (userN, passN)
+        cursordb.execute(sql, val)
+        results = cursordb.fetchall()
 
-        root.destroy()
-        fun(db)
+        if results:
+            for row in results:
+                fun(db)
+                break
+        else:
+
+            Button(root, text='Register', width=20, bg="black", fg='white', command=registerAccount).place(x=180, y=250)
+
 
 
     except mdb.Error as e:
         label_connection.configure(text="Not Successfully Connected \n Register an account?")
         buttonReg = tk.Button(root, text="Register", command=registerAccount).grid(row=3,column=1)
 
-        #importSQL(user,password)
-
-        root.after(7000, lambda: root.destroy())
 
     return
 
-
-root = tk.Tk()                                                            # call tkinter library to create the window
-root.geometry('400x200+100+200')
-root.title('Fantastic Sardines')
-
-userN = tk.StringVar()                                                     # the variables that user enters in box as string
-passW = tk.StringVar()
-
-labelUser = tk.Label(root, text="Username").grid(row=1, column=0)          # create the boxes for user to fill in
-labelPass = tk.Label(root, text="Password").grid(row=2, column=0)
-
-labelResult = tk.Label(root)
-labelResult.grid(row=7, column=2)
-
-entryNum1 = tk.Entry(root, textvariable=userN).grid(row=1, column=2)         # take the user input with Entry and pass it to variables
-entryNum2 = tk.Entry(root, textvariable=passW).grid(row=2, column=2)
-
-call_connection = partial(call_connection, labelResult, userN, passW)                        # parse the user input in function
-
-buttonCal = tk.Button(root, text="Login", command=call_connection).grid(row=3, column=0)    # and call it when button is clicked
-
+mainWindow()
 root.mainloop()
+
